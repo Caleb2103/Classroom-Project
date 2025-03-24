@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+import { environment } from '../../environments/environment';
 import {
   HttpClient,
   HttpErrorResponse,
@@ -11,7 +12,8 @@ import { catchError, Observable, retry, throwError } from 'rxjs';
   providedIn: 'root',
 })
 export class CourseService {
-  basePath = 'http://127.0.0.1:8000/main/classroom'; // URL del backend
+  basePath = environment.apiUrl + 'classroom'
+  //basePath = 'http://127.0.0.1:8000/main/classroom'; // URL del backend
 
   httpOptions = {
     headers: new HttpHeaders({

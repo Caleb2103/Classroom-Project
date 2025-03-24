@@ -6,12 +6,14 @@ import {
 } from '@angular/common/http';
 
 import { catchError, Observable, retry, throwError } from 'rxjs';
+import { environment } from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root',
 })
 export class LoginService {
-  basePath = 'http://127.0.0.1:8000/main/login'; // URL del backend
+  basePath = environment.apiUrl + 'login'
+  //basePath = 'http://127.0.0.1:8000/main/login'; // URL del backend
 
   httpOptions = {
     headers: new HttpHeaders({
