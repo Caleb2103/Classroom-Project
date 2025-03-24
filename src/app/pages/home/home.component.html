@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dashboard con Tabla</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css"
+    />
+  </head>
+  <body class="flex bg-gray-100 min-h-screen">
+    <!-- Contenido principal -->
+    <main class="flex-1 p-6">
+      <!-- Barra superior -->
+      <header
+        class="flex justify-between items-center py-4 border-b border-gray-500/30"
+      >
+        <div class="relative">
+          <a
+            href="https://imgbb.com/"
+            class="flex items-center space-x-3 rtl:space-x-reverse"
+          >
+            <img
+              src="https://i.ibb.co/Rpkg63BJ/sanantonio.png"
+              class="h-11"
+              alt="Flowbite Logo"
+            />
+            <span
+              class="self-center text-2xl font-semibold whitespace-nowrap dark:text-white"
+              >San Antonio de Padua</span
+            >
+          </a>
+        </div>
+        <div class="flex items-center space-x-6">
+          <i class="bx bx-bell text-xl text-gray-600"></i>
+          <div class="flex items-center space-x-2">
+            <img
+              src="https://images.unsplash.com/photo-1633332755192-727a05c4013d?fm=jpg&q=60&w=3000&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8dXNlcnxlbnwwfHwwfHx8MA%3D%3D"
+              alt="User"
+              class="w-8 h-8 rounded-full"
+            />
+            <span class="text-gray-700">Caleb Reategui</span>
+          </div>
+        </div>
+      </header>
+
+      <!-- Título y botones -->
+      <div class="mb-5">
+        <h3 class="text-2xl py-4 font-semibold text-[#3E6CEA]">
+          Lista de Cursos
+        </h3>
+        <div class="flex items-center gap-4">
+          <div class="relative">
+            <input
+              type="text"
+              placeholder="Buscar"
+              class="border border-gray-400 rounded-lg px-4 py-2 text-sm focus:border-gray-300 focus:ring-1 focus:outline-none"
+              [(ngModel)]="searchTerm"
+              (input)="currentPage = 1"
+            />
+            <i
+              class="bx bx-search absolute right-3 top-1/2 transform -translate-y-1/2 text-blue-500"
+            ></i>
+          </div>
+          <button
+            class="flex items-center gap-2 bg-[#3E6CEA] text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-blue-700 transition"
+            (click)="openModal()"
+          >
+            <i class="bx bx-upload"></i> Importar
+          </button>
+          <button
+            class="flex items-center gap-2 bg-gray-200 text-gray-600 px-4 py-2 rounded-md text-sm font-medium hover:bg-gray-300 transition"
+          >
+            <i class="bx bx-download"></i> Exportar
+          </button>
+        </div>
+      </div>
+
+      <!-- Modal (Pop-up) -->
+      <div
+        *ngIf="isModalOpen"
+        class="fixed inset-0 flex items-center justify-center bg-black/60 z-40"
+      >
+        <div class="bg-white p-6 rounded-lg shadow-lg w-96">
+          <h2 class="text-lg font-semibold mb-2">Subir archivo CSV</h2>
+
+          <label
+            for="fileType"
+            class="block text-sm font-medium text-gray-700 mb-2"
+          >
+            Selecciona el tipo de archivo:
+          </label>
+          <select
+            id="fileType"
+            [(ngModel)]="fileType"
+            class="text-sm w-full p-2 border border-gray-300 rounded-md mb-3"
+          >
+            <option value="courses">Cursos</option>
+            <option value="students">Estudiantes</option>
+          </select>
+
+          <label
+            for="csvFile"
+            class="block text-sm font-medium text-gray-700 mb-2"
+            >Selecciona un archivo CSV:</label
+          >
+          <input
+            id="csvFile"
+            type="file"
+            (change)="onFileSelected($event)"
+            accept=".csv"
+            class="text-sm w-full p-2 border border-gray-300 rounded-md"
+          />
+
+          <div class="mt-4 flex flex-col gap-2">
+            <!-- Progress Bar -->
+            <div
+              *ngIf="isUploading"
+              class="w-full bg-gray-200 rounded-full mb-2"
+            >
+              <div
+                class="bg-blue-600 text-xs font-medium text-blue-100 text-center p-1.5 leading-none rounded-full transition-all duration-300"
+                [style.width.%]="progress"
+              >
+                {{ progress }}%
+              </div>
+            </div>
+
+            <div class="flex justify-end gap-2">
+              <button
+                class="px-4 py-2 bg-gray-300 rounded-md text-sm font-medium hover:bg-gray-400 transition"
+                (click)="closeModal()"
+                [disabled]="isUploading"
+              >
+                Cancelar
+              </button>
+              <button
+                class="px-4 py-2 bg-blue-600 text-white rounded-md text-sm font-medium hover:bg-blue-700 transition"
+                (click)="uploadFile()"
+                [disabled]="!selectedFile || !fileType || isUploading"
+              >
+                Subir
+              </button>
+            </div>
+          </div>
+
+          <p *ngIf="uploadMessage" class="mt-2 text-sm text-red-500">
+            {{ uploadMessage }}
+          </p>
+        </div>
+      </div>
+
+      <!-- Modal de Error -->
+      <div
+        *ngIf="isErrorModalOpen"
+        class="fixed inset-0 flex items-center justify-center bg-black/60 z-40"
+      >
+        <div class="bg-white p-6 rounded-lg shadow-lg w-96">
+          <h2 class="text-lg font-semibold text-red-600 mb-2">
+            Error al subir archivo
+          </h2>
+          <h5 class="text-md text-gray-700 my-3">
+            {{this.errorMessage}}
+          </h5>
+
+          <button
+            (click)="isErrorModalOpen = false"
+            class="w-full bg-red-600 text-white p-2 rounded-md hover:bg-red-700"
+          >
+            Cerrar
+          </button>
+        </div>
+      </div>
+
+      <!-- Tabla -->
+      <div class="relative overflow-x-auto shadow-md sm:rounded-lg">
+        <table
+          class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400"
+        >
+          <thead
+            class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400"
+          >
+            <tr>
+              <th scope="col" class="px-6 py-3">ID Curso</th>
+              <th scope="col" class="px-6 py-3">Nombre</th>
+              <th scope="col" class="px-6 py-3">Nivel</th>
+              <th scope="col" class="px-6 py-3">Aula</th>
+              <th scope="col" class="px-6 py-3">Profesor</th>
+              <th scope="col" class="px-6 py-3">Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            <!-- Skeleton Loader -->
+            <ng-container *ngIf="isLoading">
+              <tr
+                *ngFor="let _ of [1, 2, 3, 4, 5]"
+                class="animate-pulse bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700"
+              >
+                <td class="px-6 py-4">
+                  <div class="h-4 bg-gray-300 rounded w-10"></div>
+                </td>
+                <td class="px-6 py-4">
+                  <div class="h-4 bg-gray-300 rounded w-32"></div>
+                </td>
+                <td class="px-6 py-4">
+                  <div class="h-4 bg-gray-300 rounded w-24"></div>
+                </td>
+                <td class="px-6 py-4">
+                  <div class="h-4 bg-gray-300 rounded w-20"></div>
+                </td>
+                <td class="px-6 py-4">
+                  <div class="h-4 bg-gray-300 rounded w-32"></div>
+                </td>
+                <td class="px-6 py-4">
+                  <div class="h-6 bg-gray-300 rounded w-10"></div>
+                </td>
+              </tr>
+            </ng-container>
+
+            <!-- Datos reales cuando se cargan -->
+            <ng-container *ngIf="!isLoading">
+              <tr
+                *ngFor="let course of paginatedCourses"
+                class="bg-white border-b dark:bg-gray-800 dark:border-gray-700 border-gray-200"
+              >
+                <td class="px-6 py-4 truncate max-w-[100px]">
+                  {{ course.id }}
+                </td>
+                <th
+                  scope="row"
+                  class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
+                >
+                  {{ course.name }}
+                </th>
+                <td class="px-6 py-4">{{ course.description }}</td>
+                <td class="px-6 py-4">{{ course.room }}</td>
+                <td class="px-6 py-4">{{ course.section }}</td>
+                <td class="px-6 py-4 flex items-start h-full">
+                  <button
+                    class="flex items-center gap-2 bg-blue-500 text-white px-2 py-2 rounded-lg text-sm font-medium hover:bg-blue-600 transition"
+                    (click)="sidebar.openSidebar(course.id)"
+                  >
+                    <i class="bx bx-list-ul text-xl"></i>
+                  </button>
+                </td>
+                <app-sidebar #sidebar></app-sidebar>
+              </tr>
+            </ng-container>
+
+            <div class="flex items-center justify-between mt-6">
+              <div class="text-sm text-gray-700">
+                Mostrando
+                <span class="font-medium">{{
+                  (currentPage - 1) * itemsPerPage + 1
+                }}</span>
+                a
+                <span class="font-medium">{{
+                  Math.min(currentPage * itemsPerPage, courses.length)
+                }}</span>
+                de
+                <span class="font-medium">{{ courses.length }}</span> resultados
+              </div>
+
+              <div class="text-sm text-gray-700">
+                Filas por página:
+                <select
+                  [(ngModel)]="itemsPerPage"
+                  (change)="changePage(1)"
+                  class="border border-gray-300 rounded px-2 py-1 mx-1 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                >
+                  <option *ngFor="let size of [5, 10, 25, 50]" [value]="size">
+                    {{ size }}
+                  </option>
+                </select>
+              </div>
+
+              <nav aria-label="Paginación" class="inline-flex">
+                <ul class="flex items-center -space-x-px h-8 text-sm">
+                  <li>
+                    <button
+                      (click)="changePage(currentPage - 1)"
+                      [disabled]="currentPage === 1"
+                      class="flex items-center justify-center px-3 h-8 ms-0 leading-tight text-gray-500 bg-white border border-e-0 border-gray-300 rounded-s-lg hover:bg-gray-100 hover:text-gray-700"
+                    >
+                      <i class="bx bx-chevron-left text-lg"></i>
+                    </button>
+                  </li>
+
+                  <li
+                    *ngFor="
+                      let page of [].constructor(totalPages());
+                      let i = index
+                    "
+                  >
+                    <button
+                      (click)="changePage(i + 1)"
+                      [class.bg-blue-50]="currentPage === i + 1"
+                      class="flex items-center justify-center px-3 h-8 leading-tight text-gray-500 bg-white border border-gray-300 hover:bg-gray-100 hover:text-gray-700"
+                    >
+                      {{ i + 1 }}
+                    </button>
+                  </li>
+
+                  <li>
+                    <button
+                      (click)="changePage(currentPage + 1)"
+                      [disabled]="
+                        currentPage === totalPages() && !nextPageToken
+                      "
+                      class="flex items-center justify-center px-3 h-8 leading-tight text-gray-500 bg-white border border-gray-300 rounded-e-lg hover:bg-gray-100 hover:text-gray-700"
+                    >
+                      <i class="bx bx-chevron-right text-lg"></i>
+                    </button>
+                  </li>
+                </ul>
+              </nav>
+            </div>
+          </tbody>
+        </table>
+      </div>
+    </main>
+  </body>
+</html>

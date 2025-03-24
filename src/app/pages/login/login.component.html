@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dashboard con Tabla</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css"
+    />
+  </head>
+  <body>
+    <div class="flex min-h-screen">
+      <!-- Left Section: Login Form -->
+      <div class="w-1/2 flex flex-col justify-center items-center p-10">
+        <h2 class="text-3xl font-semibold mb-6">Bienvenido de nuevo</h2>
+
+        <!-- Login Form -->
+        <form class="w-full max-w-sm" (submit)="uploadCredentials($event)">
+          <label class="block text-gray-800 font-medium mb-1">Email:</label>
+          <input
+            type="email"
+            class="text-sm w-full p-3 bg-gray-100 border border-gray-300 focus:outline-blue-500 rounded-lg mt-1 transition duration-30 ease-in-out"
+            placeholder="ejemplo@tudominio.edu.pe"
+          />
+
+          <label class="block text-gray-800 font-medium mt-4 mb-1"
+            >Contraseña:</label
+          >
+          <input
+            type="password"
+            class="text-sm w-full p-3 bg-gray-100 border border-gray-300 focus:outline-blue-500 rounded-lg mt-1 transition duration-30 ease-in-out"
+            placeholder="••••••••"
+          />
+
+          <label for="csvFile" class="block text-gray-800 font-medium mt-4 mb-1"
+            >Credenciales GCP:</label
+          >
+          <input
+            id="csvFile"
+            type="file"
+            accept=".json"
+            (change)="onFileSelected($event)"
+            class="text-sm w-full p-3 bg-gray-100 border border-gray-300 rounded-lg mt-1"
+          />
+          <button
+            [disabled]="!loginButton"
+            [ngClass]="{
+              'bg-blue-600 hover:bg-blue-700 cursor-pointer text-white':
+                loginButton,
+              'bg-gray-200 cursor-not-allowed text-gray-500': !loginButton
+            }"
+            class="w-sm py-2.5 rounded-lg mt-6"
+          >
+            Subir Archivo
+          </button>
+
+          <!-- Remember me Checkbox -->
+          <div class="flex justify-between items-center mt-4">
+            <label class="flex items-center">
+              <input type="checkbox" class="mr-2" /> Recuerdame
+            </label>
+            <a
+              href="#"
+              class="text-blue-500 hover:underline transition duration-300 ease-in-out"
+            >
+              Olvidaste tu contraseña?
+            </a>
+          </div>
+
+          <!-- Sign in Button -->
+          <button
+            type="submit"
+            [disabled]="loginButton"
+            [ngClass]="{
+              'bg-blue-600 hover:bg-blue-700 cursor-pointer text-white':
+                !loginButton,
+              'bg-gray-200 cursor-not-allowed text-gray-500': loginButton
+            }"
+            (click)="login()"
+            class="w-full py-2.5 rounded-lg mt-6"
+          >
+            Inicia sesión en tu cuenta
+          </button>
+        </form>
+
+        <!-- Don't have an account Section -->
+        <p class="mt-4 text-gray-600">
+          No tienes una cuenta?
+          <a
+            href="#"
+            class="text-blue-500 hover:underline transition duration-300 ease-in-out"
+            >Registrate</a
+          >
+        </p>
+      </div>
+
+      <!-- Right Section: Info -->
+      <div
+        class="w-1/2 bg-blue-600 flex flex-col justify-center text-white p-10"
+      >
+        <h1 class="text-5xl font-bold">Optimiza la gestión de tu colegio</h1>
+        <p class="mt-6 max-w-2xl text-left text-gray-200 font-medium">
+          Miles de instituciones educativas organizan sus clases, alumnos y
+          cursos con nuestra plataforma. Simplifica el registro de asistencia,
+          centraliza la información de cada estudiante y facilita la
+          comunicación entre docentes y alumnos.
+        </p>
+        <div class="flex items-center space-x-2 mt-6">
+          <div class="flex -space-x-2">
+            <img
+              src="https://i.ibb.co/Xr62XxKg/user1.jpg"
+              class="w-12 h-12 rounded-full border-2 border-white"
+            />
+            <img
+              src="https://i.ibb.co/JRB3Hz6w/user2.jpg"
+              class="w-12 h-12 rounded-full border-2 border-white"
+            />
+            <img
+              src="https://i.ibb.co/LzMgpkQ4/user3.jpg"
+              class="w-12 h-12 rounded-full border-2 border-white"
+            />
+            <img
+              src="https://i.ibb.co/d43c28VC/user4.jpg"
+              class="w-12 h-12 rounded-full border-2 border-white"
+            />
+          </div>
+          <span class="text-lg"
+            >Mas de <strong>50 </strong>colegios confian en nosotros</span
+          >
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
